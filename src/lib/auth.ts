@@ -50,6 +50,10 @@ export function signup(
   };
 
   writeToStorage(STORAGE_KEYS.session, session);
+  // Sync to cookie for server
+  if (typeof document !== 'undefined') {
+    setCookie('habit-session', JSON.stringify(session));
+  }
 
   return {
     success: true,
@@ -89,6 +93,10 @@ export function login(
   };
 
   writeToStorage(STORAGE_KEYS.session, session);
+  // Sync to cookie for server
+  if (typeof document !== 'undefined') {
+    setCookie('habit-session', JSON.stringify(session));
+  }
 
   return {
     success: true,
@@ -99,8 +107,33 @@ export function login(
 // LOGOUT FUNCTION
 export function logout(): void {
   removeFromStorage(STORAGE_KEYS.session);
+  // Clear cookie
+  document.cookie = 'habit-session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 }
 
-export function getCurrentSession(): Session | null {
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+}
+
+function setCookie(name: string, value: string, days = 30): void {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))}; expires=${expires}; path=/; Secure; SameSite=Strict`;
+}
+
+function getCurrentSession(): Session | null {
+  // Cookie fallback for SSR compat
+  const cookieSession = getCookie('habit-session');
+  if (cookieSession) {
+    try {
+      return JSON.parse(decodeURIComponent(cookieSession)) as Session;
+    } catch {
+      // invalid cookie
+    }
+  }
+  // LocalStorage primary
   return readFromStorage<Session | null>(STORAGE_KEYS.session, null);
 }
