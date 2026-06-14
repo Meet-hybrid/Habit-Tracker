@@ -21,7 +21,11 @@ export function writeToStorage<T>(key: string, value: T): void {
     return;
   }
 
-  window.localStorage.setItem(key, JSON.stringify(value));
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error("Failed to write to local storage:", error);
+  }
 }
 
 export function removeFromStorage(key: string): void {

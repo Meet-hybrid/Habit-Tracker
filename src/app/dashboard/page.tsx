@@ -24,7 +24,7 @@ export default function DashboardPage() {
 
 function DashboardContent() {
   const session = getCurrentSession();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD in local time
 
   const [habits, setHabits] = useState<Habit[]>(
     session ? getHabitsByUser(session.userId) : [],
@@ -32,11 +32,13 @@ function DashboardContent() {
   const [showForm, setShowForm] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const closeModal = () => {
     setHabitToDelete(null);
     setShowForm(false);
     setEditingHabit(null);
+    setError(null);
   };
 
   useEffect(() => {
@@ -74,6 +76,18 @@ function DashboardContent() {
   }) {
     if (!session) return;
 
+    const allHabits = getHabits();
+    const isDuplicate = allHabits.some(
+      (h) =>
+        h.userId === session.userId &&
+        h.name.toLowerCase() === values.name.toLowerCase(),
+    );
+
+    if (isDuplicate) {
+      setError("A habit with this name already exists.");
+      return;
+    }
+
     const newHabit: Habit = {
       id: crypto.randomUUID(),
       userId: session.userId,
@@ -84,10 +98,11 @@ function DashboardContent() {
       completions: [],
     };
 
-    const updatedHabits = [newHabit, ...getHabits()];
+    const updatedHabits = [newHabit, ...allHabits];
 
     syncHabits(updatedHabits);
     setShowForm(false);
+    setError(null);
   }
 
   function handleEditHabit(values: {
@@ -95,9 +110,22 @@ function DashboardContent() {
     description: string;
     frequency: "daily";
   }) {
-    if (!editingHabit) return;
+    if (!editingHabit || !session) return;
 
-    const updatedHabits = getHabits().map((habit) => {
+    const allHabits = getHabits();
+    const isDuplicate = allHabits.some(
+      (h) =>
+        h.userId === session.userId &&
+        h.id !== editingHabit.id &&
+        h.name.toLowerCase() === values.name.toLowerCase(),
+    );
+
+    if (isDuplicate) {
+      setError("A habit with this name already exists.");
+      return;
+    }
+
+    const updatedHabits = allHabits.map((habit) => {
       if (habit.id !== editingHabit.id) {
         return habit;
       }
@@ -112,6 +140,7 @@ function DashboardContent() {
 
     syncHabits(updatedHabits);
     setEditingHabit(null);
+    setError(null);
   }
 
   function handleToggleComplete(habitToUpdate: Habit) {
@@ -215,6 +244,12 @@ function DashboardContent() {
               onCancel={() => setEditingHabit(null)}
             />
           </Modal>
+        )}
+
+        {error && (
+          <div className="rounded-xl bg-rose-500/10 border border-rose-500/20 px-4 py-3 text-sm text-rose-400">
+            {error}
+          </div>
         )}
 
         <HabitList

@@ -9,7 +9,7 @@ function subtractDays(date: string, days: number): string {
 
 export function calculateCurrentStreak(
   completions: string[],
-  today = new Date().toISOString().slice(0, 10),
+  today = new Date().toLocaleDateString("en-CA"), // YYYY-MM-DD in local time
 ): number {
   const uniqueCompletions = Array.from(new Set(completions)).sort();
 

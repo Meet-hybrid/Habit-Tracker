@@ -12,6 +12,9 @@ export function validateHabitName(name: string): ValidatorResult {
   if (value.length < 3) {
     return { valid: false, value, error: "Name must be at least 3 characters" };
   }
+  if (value.length > 50) {
+    return { valid: false, value, error: "Name must be less than 50 characters" };
+  }
   return { valid: true, value, error: null };
 }
 
