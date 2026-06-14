@@ -1,8 +1,16 @@
 "use client";
 
+import { motion } from "framer-motion";
 import type { Habit } from "@/types/habit";
 import { calculateCurrentStreak } from "@/lib/streaks";
 import { getHabitSlug } from "@/lib/slug";
+import { Check, Edit2, Trash2, Flame } from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 type HabitCardProps = {
   habit: Habit;
@@ -24,70 +32,105 @@ export default function HabitCard({
   const isCompletedToday = habit.completions.includes(today);
 
   return (
-    <article
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
       data-testid={`habit-card-${slug}`}
-      className={`rounded-2xl border-l-4 p-5 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${
+      className={cn(
+        "group relative overflow-hidden rounded-2xl border transition-all duration-300",
         isCompletedToday
-          ? "border-l-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200"
-          : "border-l-indigo-400 bg-white border border-slate-100"
-      }`}
+          ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+          : "border-white/10 bg-white/5 hover:border-white/20"
+      )}
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            {isCompletedToday && (
-              <span className="text-violet-500 text-base">✓</span>
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              {isCompletedToday && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white"
+                >
+                  <Check size={12} strokeWidth={3} />
+                </motion.div>
+              )}
+              <h2 className={cn(
+                "text-lg font-bold tracking-tight break-words",
+                isCompletedToday ? "text-emerald-400" : "text-slate-100"
+              )}>
+                {habit.name}
+              </h2>
+            </div>
+
+            {habit.description && (
+              <p className="text-sm text-slate-400 leading-relaxed line-clamp-2 break-words">
+                {habit.description}
+              </p>
             )}
-            <h2 className={`text-lg font-bold tracking-tight ${isCompletedToday ? "text-violet-700" : "text-slate-800"}`}>
-              {habit.name}
-            </h2>
+
+            <div className="mt-4 flex items-center gap-3">
+              <div className={cn(
+                "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider",
+                streak > 0 
+                  ? "bg-orange-500/10 text-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.1)]" 
+                  : "bg-slate-500/10 text-slate-500"
+              )}>
+                <Flame size={12} className={streak > 0 ? "animate-pulse" : ""} />
+                {streak} Day Streak
+              </div>
+            </div>
           </div>
 
-          {habit.description && (
-            <p className="mt-1 text-sm text-slate-500 leading-relaxed">{habit.description}</p>
-          )}
+          <div className="flex flex-wrap items-center gap-2 sm:self-start">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              data-testid={`habit-complete-${slug}`}
+              type="button"
+              onClick={() => onToggleComplete(habit)}
+              className={cn(
+                "flex h-10 items-center justify-center rounded-xl px-4 font-mono text-sm font-bold transition-all",
+                isCompletedToday
+                  ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/20"
+              )}
+            >
+              {isCompletedToday ? "Done!" : "Complete"}
+            </motion.button>
 
-          <p
-            data-testid={`habit-streak-${slug}`}
-            className={`mt-3 text-xs font-semibold uppercase tracking-wider ${streak > 0 ? "text-amber-600" : "text-slate-400"}`}
-          >
-            🔥 {streak} day{streak === 1 ? "" : "s"} streak
-          </p>
-        </div>
+            <div className="flex items-center gap-1">
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                data-testid={`habit-edit-${slug}`}
+                type="button"
+                onClick={() => onEdit(habit)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 transition-all hover:bg-white/10 hover:text-white"
+                title="Edit Habit"
+              >
+                <Edit2 size={16} />
+              </motion.button>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            data-testid={`habit-complete-${slug}`}
-            type="button"
-            onClick={() => onToggleComplete(habit)}
-            className={`rounded-xl px-3 py-2 font-mono font-bold text-sm cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
-              isCompletedToday
-                ? "bg-violet-100 text-violet-700 border border-violet-300 hover:bg-violet-200"
-                : "bg-indigo-600 text-white hover:bg-indigo-700"
-            }`}
-          >
-            {isCompletedToday ? "Unmark" : "Complete"}
-          </button>
-
-          <button
-            data-testid={`habit-edit-${slug}`}
-            type="button"
-            onClick={() => onEdit(habit)}
-            className="rounded-xl font-mono border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 cursor-pointer transition-all duration-300 hover:bg-slate-800 hover:text-white hover:border-slate-800 hover:-translate-y-1"
-          >
-            Edit
-          </button>
-
-          <button
-            data-testid={`habit-delete-${slug}`}
-            type="button"
-            onClick={() => onDelete(habit)}
-            className="rounded-xl font-mono border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-500 cursor-pointer transition-all duration-300 hover:bg-rose-500 hover:text-white hover:-translate-y-1"
-          >
-            Delete
-          </button>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                data-testid={`habit-delete-${slug}`}
+                type="button"
+                onClick={() => onDelete(habit)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400 transition-all hover:bg-rose-500 hover:text-white"
+                title="Delete Habit"
+              >
+                <Trash2 size={16} />
+              </motion.button>
+            </div>
+          </div>
         </div>
       </div>
-    </article>
+
+      {/* Completion Progress Bar Decoration */}
+      <div className="absolute bottom-0 left-0 h-1 bg-emerald-500 transition-all duration-500" 
+           style={{ width: isCompletedToday ? "100%" : "0%" }} />
+    </motion.article>
   );
 }

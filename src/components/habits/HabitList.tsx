@@ -2,6 +2,7 @@
 
 import type { Habit } from "@/types/habit";
 import HabitCard from "./HabitCard";
+import { motion, AnimatePresence } from "framer-motion";
 
 type HabitListProps = {
   habits: Habit[];
@@ -20,30 +21,34 @@ export default function HabitList({
 }: HabitListProps) {
   if (habits.length === 0) {
     return (
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
         data-testid="empty-state"
-        className="rounded-2xl bg-white p-6 shadow-sm"
+        className="rounded-2xl bg-white/5 border border-white/10 p-8 text-center"
       >
-        <h2 className="text-lg font-semibold text-[#123524]">No habits yet</h2>
-        <p className="mt-2 text-sm text-[#667085]">
-          Create your first habit to start tracking your progress.
+        <h2 className="text-xl font-bold text-white">No habits yet</h2>
+        <p className="mt-2 text-sm text-slate-400">
+          Create your first habit to start tracking your progress and building streaks.
         </p>
-      </div>
+      </motion.div>
     );
   }
 
   return (
     <div className="grid gap-4">
-      {habits.map((habit) => (
-        <HabitCard
-          key={habit.id}
-          habit={habit}
-          today={today}
-          onToggleComplete={onToggleComplete}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      ))}
+      <AnimatePresence mode="popLayout">
+        {habits.map((habit) => (
+          <HabitCard
+            key={habit.id}
+            habit={habit}
+            today={today}
+            onToggleComplete={onToggleComplete}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
