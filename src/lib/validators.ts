@@ -7,13 +7,13 @@ interface ValidatorResult {
 export function validateHabitName(name: string): ValidatorResult {
   const value = name.trim();
   if (!value) {
-    return { valid: false, value, error: 'Name is required.' };
+    return { valid: false, value, error: 'Habit name is required' };
   }
   if (value.length < 3) {
     return { valid: false, value, error: "Name must be at least 3 characters" };
   }
-  if (value.length > 50) {
-    return { valid: false, value, error: "Name must be less than 50 characters" };
+  if (value.length > 60) {
+    return { valid: false, value, error: "Habit name must be 60 characters or fewer" };
   }
   return { valid: true, value, error: null };
 }

@@ -73,14 +73,17 @@ export default function HabitCard({
             )}
 
             <div className="mt-4 flex items-center gap-3">
-              <div className={cn(
-                "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider",
-                streak > 0 
-                  ? "bg-orange-500/10 text-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.1)]" 
-                  : "bg-slate-500/10 text-slate-500"
-              )}>
+              <div 
+                data-testid={`habit-streak-${slug}`}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider",
+                  streak > 0 
+                    ? "bg-orange-500/10 text-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.1)]" 
+                    : "bg-slate-500/10 text-slate-500"
+                )}
+              >
                 <Flame size={12} className={streak > 0 ? "animate-pulse" : ""} />
-                {streak} Day Streak
+                Current streak: {streak} days
               </div>
             </div>
           </div>
