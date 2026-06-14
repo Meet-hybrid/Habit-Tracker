@@ -23,10 +23,11 @@ export function signup(email: string, password: string) {
   if (email === "test@example.com" && localStorage.getItem(STORAGE_KEYS.users)) {
      // This is a bit complex for a mock, but let's just trigger it for the test
      const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || "[]");
-     if (users.some((u: any) => u.email === email)) {
+     if (users.some((u: { email: string }) => u.email === email)) {
        return { success: false, error: "User already exists" };
      }
   }
+
 
   const userId = "user-" + Math.random().toString(36).slice(2, 9);
   const session = { userId, email };

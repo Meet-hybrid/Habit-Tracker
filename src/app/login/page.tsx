@@ -30,6 +30,12 @@ export default function LoginPage() {
 
         <LoginForm />
 
+        <div className="mt-4 text-right">
+          <Link href="/forgot-password" className="text-xs font-semibold text-slate-400 hover:text-indigo-400 transition-colors">
+            Forgot Password?
+          </Link>
+        </div>
+
         <p className="mt-6 text-center text-sm text-slate-400">
           Don&apos;t have an account?{" "}
           <Link href="/signup" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">

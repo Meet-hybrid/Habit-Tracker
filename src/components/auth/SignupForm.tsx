@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signup } from "@/lib/auth";
 import { Eye, EyeOff } from "lucide-react";
+import { validatePassword } from "@/lib/validators";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -16,6 +17,12 @@ export default function SignupForm() {
 
   function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    const passwordResult = validatePassword(password);
+    if (!passwordResult.valid) {
+      setError(passwordResult.error);
+      return;
+    }
 
     const result = signup(email, password);
 

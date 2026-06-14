@@ -38,7 +38,7 @@ describe("auth flow", () => {
     );
 
     // find signup password input element and type password into it
-    await user.type(screen.getByTestId("auth-signup-password"), "password123");
+    await user.type(screen.getByTestId("auth-signup-password"), "Password123");
 
     // simulate user submitting the form
     await user.click(screen.getByTestId("auth-signup-submit"));
@@ -66,7 +66,7 @@ describe("auth flow", () => {
       screen.getByTestId("auth-signup-email"),
       "test@example.com",
     );
-    await user.type(screen.getByTestId("auth-signup-password"), "password123");
+    await user.type(screen.getByTestId("auth-signup-password"), "Password123");
     await user.click(screen.getByTestId("auth-signup-submit"));
 
     cleanup();
@@ -78,7 +78,7 @@ describe("auth flow", () => {
       screen.getByTestId("auth-signup-email"),
       "test@example.com",
     );
-    await user.type(screen.getByTestId("auth-signup-password"), "password123");
+    await user.type(screen.getByTestId("auth-signup-password"), "Password123");
     await user.click(screen.getByTestId("auth-signup-submit"));
 
     expect(screen.getByText("User already exists")).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe("auth flow", () => {
       screen.getByTestId("auth-signup-email"),
       "login@example.com",
     );
-    await user.type(screen.getByTestId("auth-signup-password"), "password123");
+    await user.type(screen.getByTestId("auth-signup-password"), "Password123");
     await user.click(screen.getByTestId("auth-signup-submit"));
 
     window.localStorage.removeItem(STORAGE_KEYS.session);
@@ -106,7 +106,7 @@ describe("auth flow", () => {
       screen.getByTestId("auth-login-email"),
       "login@example.com",
     );
-    await user.type(screen.getByTestId("auth-login-password"), "password123");
+    await user.type(screen.getByTestId("auth-login-password"), "Password123");
     await user.click(screen.getByTestId("auth-login-submit"));
 
     const session = JSON.parse(
